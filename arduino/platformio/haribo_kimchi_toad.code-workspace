@@ -1,0 +1,47 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "esp32c3_helloworld",
+			"path": "esp32c3_helloworld/esp32c3_helloworld"
+		},
+		{
+			"name": "esp32s3_transmitter_host_w_midi",
+			"path": "esp32s3_transmitter_host_w_midi"
+		},
+		{
+			"name": "WEMOS_ESP32S2_MIDI_ELRSTX",
+			"path": "WEMOS_ESP32S2_MIDI_ELRSTX"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cstddef": "cpp",
+			"__bit_reference": "cpp",
+			"__config": "cpp",
+			"__hash_table": "cpp",
+			"__split_buffer": "cpp",
+			"__tree": "cpp",
+			"array": "cpp",
+			"chrono": "cpp",
+			"deque": "cpp",
+			"filesystem": "cpp",
+			"forward_list": "cpp",
+			"initializer_list": "cpp",
+			"iterator": "cpp",
+			"locale": "cpp",
+			"map": "cpp",
+			"print": "cpp",
+			"queue": "cpp",
+			"random": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"unordered_map": "cpp",
+			"vector": "cpp",
+			"unordered_set": "cpp",
+			"memory": "cpp"
+		}
+	}
+}
