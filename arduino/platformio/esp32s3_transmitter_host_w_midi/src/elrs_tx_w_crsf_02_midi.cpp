@@ -26,7 +26,6 @@
  * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
 #include "EEPROM.h"
 #include "config.h"
 #include "crsf.h"
@@ -44,9 +43,6 @@ Adafruit_USBD_MIDI usb_midi;
 MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 
 void printBytes(const byte *data, unsigned int size);
-// uint16_t processDeadband(uint16_t val, uint16_t range);
-uint8_t mapToActualMinMax_256(uint8_t val, uint8_t range);
-uint16_t mapToActualMinMax_1024(uint16_t val, uint16_t range);
 
 void handleNoteOn(byte channel, byte pitch, byte velocity);
 void handleNoteOff(byte channel, byte pitch, byte velocity);
@@ -795,28 +791,6 @@ void handleControlChange(byte channel, byte data1, byte data2)
             }
         }
     }
-
-    /*
-    if (channel == 1 && data1 == 0)
-    {
-        rcChannels[AILERON] = map(data2, 0, 127, CRSF_DIGITAL_CHANNEL_MIN, CRSF_DIGITAL_CHANNEL_MAX);
-    }
-
-    if (channel == 1 && data1 == 1)
-    {
-        rcChannels[ELEVATOR] = map(data2, 0, 127, CRSF_DIGITAL_CHANNEL_MIN, CRSF_DIGITAL_CHANNEL_MAX);
-    }
-
-    if (channel == 1 && data1 == 2)
-    {
-        rcChannels[THROTTLE] = map(data2, 0, 127, CRSF_DIGITAL_CHANNEL_MIN, CRSF_DIGITAL_CHANNEL_MAX);
-    }
-
-    if (channel == 1 && data1 == 3)
-    {
-        rcChannels[RUDDER] = map(data2, 0, 127, CRSF_DIGITAL_CHANNEL_MIN, CRSF_DIGITAL_CHANNEL_MAX);
-    }
-    //*/
 }
 
 void handleNoteOn(byte channel, byte pitch, byte velocity)
@@ -843,25 +817,4 @@ void handleNoteOff(byte channel, byte pitch, byte velocity)
 
     Serial.print(" velocity = ");
     Serial.println(velocity);
-}
-
-uint8_t mapToActualMinMax_256(uint8_t val, uint8_t range)
-{
-    switch (range)
-    {
-    case DEADBAND_INPUT_RANGE::_256:
-        return constrain(map(val, 0, 127, 10, 117), 0, 127);
-        break;
-    }
-}
-
-uint16_t mapToActualMinMax_1024(uint16_t val, uint16_t range)
-{
-    switch (range)
-    {
-    case DEADBAND_INPUT_RANGE::_1024:
-        // return constrain(map(val, 0, 1023, 127, 936), 0, 1023);
-        return constrain(map(val, 0, 1023, 130, 936), 0, 1023);
-        break;
-    }
 }

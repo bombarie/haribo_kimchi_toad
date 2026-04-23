@@ -6,7 +6,7 @@
 #include <HardwareSerial.h>
 
 // SET FALSE FOR PRODUCTION MODE
-#define USE_SERIAL_DEBUG true
+#define USE_SERIAL_DEBUG false
 
 #define DXL_BAUDRATE 57600
 #define DXL_PROTOCOL 2
@@ -33,6 +33,8 @@
 
 int16_t motor1Value = 0;
 int16_t motor2Value = 0;
+
+float motorLowPassValue = 0.60; // between 0.0 and 1.0, higher is more smoothing but more lag
 
 byte eye_left_val = 0;
 byte eye_right_val = 0;
@@ -127,11 +129,6 @@ void setup()
   // this is a more verbose way in 3.0 API, but only necessary (imho) if you want to use ledcWriteChannel instead of the updated ledWrite
   // ledcAttachChannel(EYE_LEFT_PIN, 5000, 8, EYE_LEFT_CHANNEL);
   // ledcAttachChannel(EYE_RIGHT_PIN, 5000, 8, EYE_RIGHT_CHANNEL);
-  // ledcSetup(EYE_LEFT_CHANNEL, 5000, 8);
-  // ledcAttachPin(EYE_LEFT_PIN, EYE_LEFT_CHANNEL);
-
-  // ledcSetup(EYE_RIGHT_CHANNEL, 5000, 8);
-  // ledcAttachPin(EYE_RIGHT_PIN, EYE_RIGHT_CHANNEL);
 
   // fyi, in the updateArduino Core 3.0, ledcWrite takes the pin, NOT the channel.
   ledcWrite(EYE_LEFT_PIN, 0);
@@ -179,8 +176,10 @@ void loop()
 
 void updateMotors()
 {
-  motor1Value = map(data.ch[0], SBUS_VAL_MIN, SBUS_VAL_MAX, -255, 255);
-  motor2Value = map(data.ch[1], SBUS_VAL_MIN, SBUS_VAL_MAX, 255, -255); // reversed
+  // filter the input values with a low pass filter to prevent sudden jumps in velocity, which can cause the motors to disconnect
+
+  motor1Value = motorLowPassValue * motor1Value + (1.0 - motorLowPassValue) * map(data.ch[0], SBUS_VAL_MIN, SBUS_VAL_MAX, -255, 255);
+  motor2Value = motorLowPassValue * motor2Value + (1.0 - motorLowPassValue) * map(data.ch[1], SBUS_VAL_MIN, SBUS_VAL_MAX, 255, -255); // reversed
 
   // apply deadband
   if (abs(motor1Value) < MOTORS_DEADBAND)
@@ -285,7 +284,9 @@ void updateSerialDebugPrint()
     Serial.print((motor1_position * 360) / DYNARESOLUTION);
     Serial.print("°.");
     Serial.print(", velocity: ");
-    Serial.println(motor1_velocity);
+    Serial.print(motor1_velocity);
+    Serial.print(" -> model: ");
+    Serial.println(motor1_model);
 
     Serial.print(DXL_MOTOR_2);
     Serial.print(" -> motor2Value: ");
@@ -294,8 +295,10 @@ void updateSerialDebugPrint()
     Serial.print((motor2_position * 360) / DYNARESOLUTION);
     Serial.print("°.");
     Serial.print(", velocity: ");
-    Serial.println(motor2_velocity);
-    
+    Serial.print(motor2_velocity);
+    Serial.print(" -> model: ");
+    Serial.println(motor2_model);
+
     Serial.println("");
 
     prevSerialPrint = millis();
